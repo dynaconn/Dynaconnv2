@@ -292,4 +292,6 @@ function initialize_gui(hObject, handles, isreset)
     
     handles.FormData.dim = size(Sorted_Ave_DFC_Combined);
     %handles.FormData.borderLineNum = borderLineNum; %borderLineNum form netFName
+new_gui
     guidata(hObject,handles);
+main

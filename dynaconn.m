@@ -416,6 +416,100 @@ function compsHandle = callCompDisplayWindow(handles)
     setappdata(0,'subjNum',handles.FormData.subjNum);
     % Show Components
     compsHandle = DFC_CompDisplay();
+
+
+% --- Executes on button press in regionComponent.
+function regionComponent_Callback(hObject, eventdata, handles)
+    % Shorten some form data var names to simplify code
+    status = handles.FormData.status;
+    subjProp = handles.FormData.subjProp;
+    PCRADataExist = handles.FormData.PCRADataExist;
+    
+    % 1st check is subject has already been selected
+    if  status.setup == 0
+        errordlg('Setup must be run first');
+        return;
+    end
+    % 2nd check is subject has already been selected
+    if  status.group == 0
+        errordlg('Group setup must be run first');
+        return;
+    end
+    
+    if ~PCRADataExist && strcmpi(handles.mode,'reg')
+        errordlg('All region mean data must be precompiled first');
+        return;
+    end
+        
+    % Call function to find or generate DFC data
+    [AveFileName,h] = dfc_findDFCData(handles);
+    waitfor(AveFileName);
+    if h ~= 0, close(h); end;
+
+    % Save data to be retrieved network plot window
+    setappdata(0,'dataFile',AveFileName);
+    setappdata(0,'mode',handles.mode);
+    setappdata(0,'cmap',handles.FormData.cmap);
+    % Bring up network plot window
+    h = DFC_NewPlot;
+    waitfor(h);
+
+    % Retrieve data sent from setup GUI
+    objN1 = getappdata(0,'objN1');
+    objN2 = getappdata(0,'objN2');
+    subjNum = getappdata(0,'subjNum');
+    handles.FormData.cmap = getappdata(0,'cmap');  
+    if objN1 ~= 0
+        % Update form data
+        handles.FormData.objN1 = objN1;
+        handles.FormData.objN2 = objN2;
+        if strcmpi(handles.mode,'group')
+            for i = 1 : length(subjProp)
+                groupNums(i) = subjProp(i).group;
+            end
+            uniqueGroups = unique(groupNums);
+            nGroup = length(uniqueGroups);
+            groupList = combnk(1:nGroup,2);
+            groupN1 = groupList(subjNum,1);
+            groupN2 = groupList(subjNum,2);
+            % Set the groups based of the new subjNum
+            set(handles.popupmenu3, 'value', groupN1);
+            set(handles.popupmenu4, 'value', groupN2);            
+        else
+            handles.FormData.subjNum = subjNum;
+        end
+
+        % Set the popup component selectors based on data returned from corrMap
+        set(handles.popupmenu1, 'value', objN1);
+        set(handles.popupmenu2, 'value', objN2);
+        set(handles.subjSelPopupmenu,'value', subjNum);
+    
+        % Update label and plot based on retrieved data
+        if strcmpi(handles.mode,'net')
+            dfc_plotNet(handles);
+        elseif strcmpi(handles.mode,'reg')
+            dfc_plotReg(handles);
+        elseif strcmpi(handles.mode,'group')
+            dfc_plotGroup(handles);
+        end
+        
+        % Update the component display window if its open
+        if isfield(handles,'compsHandle')
+            if ishandle(handles.compsHandle);
+                % Get the position of the current component window
+                oldPosition = get(handles.compsHandle,'Position');
+                close(handles.compsHandle); % close the window
+                % Open a new component window and save the handle
+                h = callCompDisplayWindow(handles);
+                handles.compsHandle = h;
+                guidata(hObject,handles); % Save the handle data
+                % Move the new comp window to the old location
+                set(handles.compsHandle,'Position',oldPosition);
+            end
+        end
+        
+    end
+    guidata(hObject,handles); % Save the handle data
     
 % --- Executes on button press in regionComponent.
 function regionComponent_Callback(hObject, eventdata, handles)
@@ -829,9 +923,9 @@ function toggleGUIelements(handles, state)
         if  handles.FormData.status.group == 1
             actionString{ix} = 'Component Region Matrix';
             ix = ix + 1;
-%             %Andrew added 5/20/21
- %             actionString(ix) = 'Output DFC data';
-%             ix = ix + 1;
+new_gui
+            actionString{ix} = 'New Gui';
+ main
         end
         if strcmpi(handles.mode, 'net')
             actionString{ix} = 'Output DFC data';
