@@ -712,8 +712,8 @@ function actionPopupmenu_Callback(hObject, eventdata, handles)
     if handles.FormData.status.group == 1
         if action == 6
             matrixButton_Callback(hObject, eventdata, handles);
-        elseif action == 7 && strcmpi(handles.mode, 'reg')
-            regionComponent_Callback(hObject, eventdata, handles);
+       
+        
         elseif action == 7
             handles.FormData.dataType = 1;
             outputDFCData(handles);
@@ -825,7 +825,6 @@ function toggleGUIelements(handles, state)
     if strcmpi(state, 'on')
         actionString{ix} = 'Show Regions';
         ix = ix + 1;
-        actionString{ix} = 'New Gui';
         if  handles.FormData.status.group == 1
             actionString{ix} = 'Component Region Matrix';
             ix = ix + 1;

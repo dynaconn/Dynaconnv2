@@ -153,7 +153,7 @@ function regMapButton_Callback(hObject, eventdata, handles)
             end
             clear img;
             img = newImg;
-            clear newImg;
+             clear newImg;
         end
         
         % Check the reg map status
