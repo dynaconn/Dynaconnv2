@@ -80,7 +80,10 @@ function outWave = dfc_expVal(handles, winMode, sig)
     % Move window across timepoints and get correlation
     % between waveforms
     if strcmpi(winMode, 'on')   
-        outWave = zeros(1,uint16(ceil((timeN - windowSize) / stepSize)));
+        %TODO Andrew: Before adding the .0001 to ceil(.0001+(timeN -
+        %windowSize) / stepSize))), check if that will affect the ev file
+        %in other functions
+        outWave = zeros(1,uint16(ceil(.0001+(timeN - windowSize) / stepSize)));
         index = 1;
         for i = 1 : stepSize : (timeN - windowSize)
             wave1 = hrfwave(i:i+windowSize-1);
