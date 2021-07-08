@@ -34,7 +34,10 @@ end
 if nargout
     [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
 else
+    display('pwd in Dynaconn.m: dy')
+    pwd
     gui_mainfcn(gui_State, varargin{:});
+    
 end
 % End initialization code - DO NOT EDIT
 
@@ -420,6 +423,8 @@ function compsHandle = callCompDisplayWindow(handles)
 % --- Executes on button press in regionComponent.
 function regionComponent_Callback(hObject, eventdata, handles)
     % Shorten some form data var names to simplify code
+    
+    %TODO Andrew: Save these to output location
     status = handles.FormData.status;
     subjProp = handles.FormData.subjProp;
     regMap = handles.FormData.regMap;
@@ -479,7 +484,7 @@ function matrixButton_Callback(hObject, eventdata, handles)
     % Call function to find or generate DFC data
     [AveFileName,h] = dfc_findDFCData(handles);
     waitfor(AveFileName);
-    if h ~= 0, close(h); end;
+    if h ~= 0, close(h); end
 
     % Save data to be retrieved network plot window
     setappdata(0,'dataFile',AveFileName);

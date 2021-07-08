@@ -1,13 +1,22 @@
-function [RegDFCData, h] = dfc_buildRegDFC(regMap, subjProp)
+function [RegDFCData, h] = dfc_buildRegDFC(handles, regMap, subjProp)
 %DFC_BUILDRegDFC Build a .mat file with DFC Results
 %   Detailed explanation goes here
 %TODO: Add to action menu and generate after user is able to view region
 %average and can play with window length and stepsize to determine ideal
 %settings
+       
     bContinue = true;
+    %TODO add save message
+    load(uigetfile);
     nRegions = length(regMap);
-    nSubjects = length(subjProp);
-    maxTP = subjProp(1).srcDim(4);
+    nSubjects = length(RegAveData(:,1,1,1));
+    %maxTP = subjProp(1).srcDim(4);
+    
+%      V = spm_vol(subjProp(s).srcFFile);    % open data file
+%     nTP = length(V);
+%     windowStart = [1:stepSize:nTP-windowLength+1];
+%     numWindows=length(windowStart);
+%     RegDFCData = zeros(nSubjects, nRegions, numRegions, numWindows);
     
     % If on windows, use parallel computing, on mac the OS does parallel itself
     if strcmpi(computer('arch'),'win64')
@@ -16,9 +25,6 @@ function [RegDFCData, h] = dfc_buildRegDFC(regMap, subjProp)
         usePfor = 0;
     end
 
-    %TODO: Make window length and step size allow user inputs
-    %User can configure after region averages generated and output to the
-    %Dynaconn window
    
     selection = questdlg("Use default window length and step size?");
     
@@ -34,8 +40,8 @@ function [RegDFCData, h] = dfc_buildRegDFC(regMap, subjProp)
             dlgtitle = 'Window Step Selection';
             dims = [1 35];
             winstep = inputdlg(prompt, dlgtitle, dims);
-            windowLength = winstep{1};
-            stepSize = winstep{2};
+            windowLength = str2num(winstep{1})
+            stepSize = str2num(winstep{2})
            
         case 'Cancel'
             return
@@ -53,24 +59,35 @@ function [RegDFCData, h] = dfc_buildRegDFC(regMap, subjProp)
     h = msgbox(Message,Title,Icon);
     
     % TODO(Johnny) not sure what this is so just make it fixed for now
-    numWindows = 5000;
-    
-    RegDFCData = zeros(nSubjects, nRegions, numWindows);
+%     timeN = handles.FormData.subjProp(1).srcDim(4)
+%     windowSize = handles.FormData.windowSize
+%     stepSize = handles.FormData.stepSize
+%     display('pwd of buildRegDFC.m: ')
+%     pwd
+%     windowSize = load('windowSize')
+%     timeN = load('timeN')
+%     stepSize = load('stepSize')
+    timeN = size(RegAveData,3)
+    numWindows = ceil(.0001+(timeN - windowLength) / stepSize)
+    nRegions = length(RegAveData(1,:,1));
+    RegDFCData = zeros(nSubjects, nRegions, nRegions, numWindows);
     
     tic;
    
     
-    % TODO(Johnny) Andrew, this is where you would do whatever analysis you are
-    % wanting to do.  For this example I'll just do an avg and you can
-    % replace it.
+    %  This is where you would do whatever analysis you are
+    % wanting to do.  
+    
+    %load the forms.
     for ns = 1 : nSubjects
-        for nr = 1 : nRegions
-            for nw = 1 : numWindows
-                RegDFCData(ns, nr, nw) = ns*nr*nw;
-            end
+        for nw = 1 : numWindows
+            myavgsignal_window1 = squeeze(RegAveData(ns,:,(nw-1)*stepSize+1:(nw-1)*stepSize+windowLength)); %changed from myavgsignal to _allsubjects
+            myROIfc_window1 = corr(myavgsignal_window1');
+            RegDFCData(ns, :, :, nw)=myROIfc_window1;
         end
+        
     end
 
     tEnd=toc;
-    fprintf('Construction of region avgs took ');
+    fprintf('Construction of Dynamic Functional Connectivity Matrix took ');
     fprintf('%d minutes and %f seconds\n\n',floor(tEnd/60),rem(tEnd,60));
