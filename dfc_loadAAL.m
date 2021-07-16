@@ -7,10 +7,12 @@
     % Unzip AAL file and then, load then delete unzipped file
     oldDir = pwd;
     
-    selection = input('use default aal atlas? Y/N ', 's')
+    selection = questdlg("Use default aal atlas? Y/N ")
     %Andrew and Zak added case for user input atlas and labels
+    %Andrew modified selection to pop-up menu, added titles to file
+    %selection windows
     switch selection
-        case 'Y'
+        case 'Yes'
             cd('templates');
             gzAALFile = '3mm_SPMresliced_aal.nii.zip';
             %gzAALFile = 'aal_2mm.nii.zip';
@@ -22,14 +24,12 @@
             labels = dfc_parseRegMapLegend(labelsfilename);
             cd(oldDir);
             
-        case 'N'
+        case 'No'
             
-            [atlasfilename, atlaspath] = uigetfile('*.nii')
-            %browse and select
-            %%Andrew, change back to aal.nii.txt
-            %img = spm_read_vols(spm_vol('C:\Users\18327\Documents\GitHub\Dynaconnv2\templates\atlas_update2018_resamp2mm.nii'));
+            [atlasfilename, atlaspath] = uigetfile('*.nii', 'Please choose the atlas file')
+          
             img = spm_read_vols(spm_vol(fullfile(atlaspath, atlasfilename)));
-            [labelsfilename,labelspath] = uigetfile('*.txt');
+            [labelsfilename,labelspath] = uigetfile('*.txt', 'Please choose the labels file')
             labels = dfc_parseRegMapLegend(fullfile(labelspath,labelsfilename));
 
     end    

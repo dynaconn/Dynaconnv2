@@ -34,9 +34,9 @@ end
 if nargout
     [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
 else
-    display('pwd in Dynaconn.m: dy')
-    pwd
-    gui_mainfcn(gui_State, varargin{:});
+%      display('pwd in Dynaconn.m: dy')
+%      pwd
+     gui_mainfcn(gui_State, varargin{:});
     
 end
 % End initialization code - DO NOT EDIT
@@ -424,7 +424,9 @@ function compsHandle = callCompDisplayWindow(handles)
 function regionComponent_Callback(hObject, eventdata, handles)
     % Shorten some form data var names to simplify code
     
-    %TODO Andrew: Save these to output location
+    %workDir = uigetdir('../','Select Compiled Region Average Directory');
+    workDir = handles.FormData.workDir
+    cd(workDir)
     status = handles.FormData.status;
     subjProp = handles.FormData.subjProp;
     regMap = handles.FormData.regMap;
@@ -452,7 +454,7 @@ function regionComponent_Callback(hObject, eventdata, handles)
     if h ~= 0, close(h); end;
 
     % Ask where to save this data
-    [filename, pathname] = uiputfile;
+    [filename, pathname] = uiputfile('DFC_Data_Results.mat','Choose a File Name for Writing the DFC Result');
     
     % Save the data to mat file
     save(strcat(pathname, filename), 'DfcData');
@@ -773,13 +775,15 @@ function toggleGUIelements(handles, state)
     if strcmpi(state, 'on')
         actionString{ix} = 'Show Regions';
         ix = ix + 1;
-        actionString{ix} = 'New Gui';
+%         actionString{ix} = 'Output DFC data';
+%             ix = ix + 1;
+         actionString{ix} = 'New Gui';
         if  handles.FormData.status.group == 1
             actionString{ix} = 'Component Region Matrix';
             ix = ix + 1;
             %Andrew added 5/20/21
-            actionString{ix} = 'Save DFC Matrix';
-            ix = ix + 1;
+             actionString{ix} = 'Output DFC data';
+             ix = ix + 1;
         end
         if strcmpi(handles.mode, 'net')
             actionString{ix} = 'Output DFC data';
