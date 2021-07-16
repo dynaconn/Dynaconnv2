@@ -11,7 +11,7 @@ function [RegDFCData, h] = dfc_buildRegDFC(handles, regMap, subjProp)
     nRegions = length(regMap);
     nSubjects = length(RegAveData(:,1,1,1));
     %maxTP = subjProp(1).srcDim(4);
-    
+   
 %      V = spm_vol(subjProp(s).srcFFile);    % open data file
 %     nTP = length(V);
 %     windowStart = [1:stepSize:nTP-windowLength+1];
